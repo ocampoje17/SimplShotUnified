@@ -28,6 +28,7 @@ export default function EditorPage() {
   const [isDrawing, setIsDrawing] = useState(false);
   const [currentAnnotation, setCurrentAnnotation] = useState<Annotation | null>(null);
   const [canvasSize, setCanvasSize] = useState({ width: 800, height: 600 });
+  const [statusMessage, setStatusMessage] = useState<{ text: string; isError: boolean } | null>(null);
   const imageHistoryRef = useRef<Annotation[][]>([]);
 
   // Load image from event or URL params
@@ -244,6 +245,11 @@ export default function EditorPage() {
     return () => window.removeEventListener('keydown', handler);
   }, [undo, redo]);
 
+  const showStatus = (text: string, isError = false) => {
+    setStatusMessage({ text, isError });
+    setTimeout(() => setStatusMessage(null), 3000);
+  };
+
   const handleSave = async () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -257,9 +263,9 @@ export default function EditorPage() {
     const dataUrl = merged.toDataURL('image/png');
     try {
       const path = await invoke<string>('save_screenshot', { dataUrl, format: 'png' });
-      alert(`Saved to: ${path}`);
+      showStatus(`Saved to: ${path}`);
     } catch (err) {
-      alert(`Error saving: ${err}`);
+      showStatus(`Error saving: ${err}`, true);
     }
   };
 
@@ -297,6 +303,17 @@ export default function EditorPage() {
           </button>
         </div>
       </div>
+
+      {/* Status toast */}
+      {statusMessage && (
+        <div
+          className={`absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-lg text-sm shadow-lg z-50 ${
+            statusMessage.isError ? 'bg-red-600 text-white' : 'bg-green-600 text-white'
+          }`}
+        >
+          {statusMessage.text}
+        </div>
+      )}
 
       <div className="flex flex-1 overflow-hidden">
         {/* Tool Sidebar */}

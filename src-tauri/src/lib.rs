@@ -27,7 +27,9 @@ pub struct CaptureResult {
 }
 
 fn get_screenshots_dir() -> PathBuf {
-    let home = dirs::home_dir().unwrap_or_else(|| PathBuf::from("."));
+    let home = dirs::home_dir().unwrap_or_else(|| {
+        std::env::current_dir().unwrap_or_else(|_| PathBuf::from("/tmp"))
+    });
     home.join("Pictures").join("SimplShot")
 }
 
