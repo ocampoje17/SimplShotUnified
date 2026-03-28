@@ -191,7 +191,7 @@ function getPreviewStyle(template: ScreenshotTemplate): React.CSSProperties {
     return { background: src.color };
   }
   if (src.type === 'gradient') {
-    const stops = src.stops.map(s => s.color).join(', ');
+    const stops = src.stops.map(s => `${s.color} ${s.position * 100}%`).join(', ');
     return { background: `linear-gradient(${src.angle}deg, ${stops})` };
   }
   return { background: '#e5e7eb' };

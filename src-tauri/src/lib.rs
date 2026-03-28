@@ -28,7 +28,7 @@ pub struct CaptureResult {
 
 fn get_screenshots_dir() -> PathBuf {
     let home = dirs::home_dir().unwrap_or_else(|| {
-        std::env::current_dir().unwrap_or_else(|_| PathBuf::from("/tmp"))
+        std::env::temp_dir()
     });
     home.join("Pictures").join("SimplShot")
 }
@@ -191,9 +191,9 @@ pub async fn open_editor<R: Runtime>(
     }
 
     let url = if let Some(path) = image_path.as_ref() {
-        format!("editor?image={}", urlencoding::encode(path))
+        format!("#/editor?image={}", urlencoding::encode(path))
     } else {
-        "editor".to_string()
+        "#/editor".to_string()
     };
 
     let w = WebviewWindowBuilder::new(&app, "editor", tauri::WebviewUrl::App(url.into()))

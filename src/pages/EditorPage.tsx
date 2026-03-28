@@ -44,7 +44,12 @@ export default function EditorPage() {
         setImage(img);
         setCanvasSize({ width: img.width, height: img.height });
       };
-      img.src = imagePath.startsWith('data:') ? imagePath : `asset://localhost/${imagePath}`;
+      // Only allow data URLs or absolute file paths – reject paths with traversal sequences
+      if (imagePath.startsWith('data:')) {
+        img.src = imagePath;
+      } else if (/^[^<>"'\n\r]+$/.test(imagePath) && !imagePath.includes('..')) {
+        img.src = `asset://localhost/${imagePath}`;
+      }
     }
 
     const unlistenData = listen<string>('load-image-data', e => {
@@ -212,7 +217,9 @@ export default function EditorPage() {
   const handleMouseUp = useCallback(() => {
     if (!isDrawing || !currentAnnotation) return;
     setIsDrawing(false);
-    imageHistoryRef.current = [...imageHistoryRef.current, annotations];
+    const MAX_HISTORY = 50;
+    const next = [...imageHistoryRef.current, annotations];
+    imageHistoryRef.current = next.length > MAX_HISTORY ? next.slice(next.length - MAX_HISTORY) : next;
     setAnnotations(prev => [...prev, currentAnnotation]);
     setRedoStack([]);
     setCurrentAnnotation(null);

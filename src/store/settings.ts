@@ -34,7 +34,15 @@ export function loadSettings(): AppSettings {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
-      return { ...defaultSettings, ...JSON.parse(raw) };
+      const stored = JSON.parse(raw) as Partial<AppSettings>;
+      return {
+        ...defaultSettings,
+        ...stored,
+        screenshotTemplate: {
+          ...defaultSettings.screenshotTemplate,
+          ...(stored.screenshotTemplate ?? {}),
+        },
+      };
     }
   } catch {
     // Fall through to defaults

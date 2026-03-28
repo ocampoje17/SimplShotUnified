@@ -1,73 +1,85 @@
-# React + TypeScript + Vite
+# SimplShotUnified
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A cross-platform port of [SimplShot](https://github.com/atlemo/SimplShot-App) (originally a macOS-only screenshot app) built with **Tauri 2**, **React**, **TypeScript**, and **Tailwind CSS**.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **System tray icon** with context menu (Capture Screen, Capture Window, Open Editor, Settings, Quit)
+- **Screenshot capture** – captures the primary screen or a specific window using the `xcap` library
+- **Built-in editor** – canvas-based annotation editor with:
+  - Annotation tools: Arrow, Rectangle, Ellipse, Text, Pen, Highlight, Blur marker
+  - Color palette with 8 swatches
+  - Undo / Redo (⌘Z / ⌘⇧Z)
+  - Save annotated image to disk
+- **Background Templates** – gradient or solid-color backgrounds, adjustable padding and corner radius
+- **Width Presets** – named pixel-width presets for quick window resizing before capture
+- **Settings window** – General, Presets, Templates, and About tabs
+- **Cross-platform** – runs on macOS, Linux, and Windows
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+| Layer | Technology |
+|-------|-----------|
+| Shell / System | Rust + Tauri 2 |
+| UI framework | React 18 + TypeScript |
+| Bundler | Vite 8 |
+| Styling | Tailwind CSS 3 |
+| Screen capture | `xcap` Rust crate |
+| Image encoding | `image` Rust crate |
+| Persistence | `localStorage` (settings) |
 
-## Expanding the ESLint configuration
+## Project Structure
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+simplshot-unified/
+├── src/                          # React frontend
+│   ├── App.tsx                   # Settings window (4 tabs)
+│   ├── main.tsx                  # Hash router (/ = settings, /editor = editor)
+│   ├── types.ts                  # Shared TypeScript types
+│   ├── store/settings.ts         # localStorage settings store
+│   ├── pages/EditorPage.tsx      # Canvas annotation editor
+│   └── components/settings/     # Settings tab components
+│       ├── GeneralSettings.tsx
+│       ├── PresetsSettings.tsx
+│       ├── TemplatesSettings.tsx
+│       └── AboutSettings.tsx
+├── src-tauri/                    # Rust backend
+│   ├── src/
+│   │   ├── lib.rs                # Commands, tray menu, plugin setup
+│   │   └── main.rs               # Entry point
+│   ├── Cargo.toml
+│   └── tauri.conf.json
+├── index.html
+├── vite.config.ts
+└── package.json
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Requirements
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- **Node.js** 18+ and npm
+- **Rust** 1.77+ (install via https://rustup.rs)
+- Tauri system dependencies for your OS – see https://tauri.app/start/prerequisites/
+- On **macOS**: Screen Recording permission must be granted to the app
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Development
+
+```bash
+# Install JS dependencies
+npm install
+
+# Run in dev mode (hot-reload frontend + Rust backend)
+npm run tauri dev
 ```
+
+## Build
+
+```bash
+# Build a production bundle
+npm run tauri build
+```
+
+The distributable is placed in `src-tauri/target/release/bundle/`.
+
+## Original App
+
+This is a Tauri port of [SimplShot-App](https://github.com/atlemo/SimplShot-App) by [@atlemo](https://github.com/atlemo), originally a macOS-native app built with Swift/SwiftUI. The original is licensed under the MIT License.
