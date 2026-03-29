@@ -1,21 +1,79 @@
 export default function AboutSettings() {
   return (
-    <div className="flex flex-col items-center justify-center h-full space-y-4 text-center">
-      <div className="text-6xl">📸</div>
-      <h1 className="text-2xl font-bold text-gray-800">SimplShot</h1>
-      <p className="text-gray-500">Version 0.1.0</p>
-      <p className="text-sm text-gray-500 max-w-sm">
-        A cross-platform screenshot tool built with Tauri, ported from the macOS SimplShot app.
-      </p>
-      <div className="flex gap-3 pt-2">
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      height: '100%',
+      padding: '0 40px 16px',
+      textAlign: 'center',
+      gap: 0,
+    }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
+        {/* App icon placeholder (macOS-style camera icon) */}
+        <div style={{
+          width: 64, height: 64,
+          borderRadius: 14,
+          background: 'linear-gradient(135deg, #1c7cef 0%, #0047ab 100%)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: 32,
+          boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+        }}>
+          📸
+        </div>
+
+        {/* App name */}
+        <div style={{ fontSize: 17, fontWeight: 600, letterSpacing: -0.2 }}>SimplShot</div>
+
+        {/* Website */}
         <a
-          href="https://github.com/atlemo/SimplShot-App"
+          href="https://www.simplshot.com"
           target="_blank"
           rel="noreferrer"
-          className="px-4 py-2 text-sm bg-gray-800 text-white rounded-lg hover:bg-gray-700"
+          style={{ fontSize: 13, color: 'var(--mac-secondary)', textDecoration: 'none' }}
+          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.textDecoration = 'underline'; }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.textDecoration = 'none'; }}
         >
-          Original App
+          www.simplshot.com
         </a>
+
+        {/* Version */}
+        <div style={{ fontSize: 13, color: 'var(--mac-secondary)' }}>Version 0.1.1</div>
+
+        {/* Author */}
+        <div style={{ fontSize: 13, color: 'var(--mac-secondary)' }}>
+          Made by{' '}
+          <a
+            href="https://atle.co"
+            target="_blank"
+            rel="noreferrer"
+            style={{ color: 'var(--mac-secondary)', textDecoration: 'none' }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.textDecoration = 'underline'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.textDecoration = 'none'; }}
+          >
+            Atle Mo
+          </a>
+        </div>
+      </div>
+
+      {/* Acknowledgments at bottom */}
+      <div style={{ width: '100%' }}>
+        <div style={{ height: 1, background: 'var(--mac-separator)', margin: '0 0 12px' }} />
+        <div style={{ fontSize: 11, fontWeight: 500, color: 'var(--mac-secondary)', marginBottom: 4 }}>
+          Acknowledgments
+        </div>
+        <div style={{ fontSize: 11, color: 'var(--mac-tertiary)', lineHeight: 1.6 }}>
+          <a
+            href="https://github.com/sindresorhus/KeyboardShortcuts"
+            target="_blank"
+            rel="noreferrer"
+            style={{ color: 'var(--mac-secondary)', textDecoration: 'none' }}
+          >
+            KeyboardShortcuts
+          </a>
+          {' '}by Sindre Sorhus
+        </div>
       </div>
     </div>
   );
