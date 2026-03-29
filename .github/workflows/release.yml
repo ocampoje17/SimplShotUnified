@@ -63,7 +63,8 @@ jobs:
             libxcb-shape0-dev \
             libxcb-xfixes0-dev \
             libxext-dev \
-            libpipewire-0.3-dev
+            libpipewire-0.3-dev \
+            libgbm-dev
 
       # ── Rust toolchain ─────────────────────────────────────────────────────
       - name: Install Rust stable
