@@ -66,41 +66,6 @@ export default function EditorPage() {
     };
   }, []);
 
-  // Render base image + committed annotations to canvas
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    if (image) {
-      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-    } else {
-      ctx.fillStyle = '#f3f4f6';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = '#9ca3af';
-      ctx.font = '16px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('No image loaded', canvas.width / 2, canvas.height / 2);
-    }
-
-    annotations.forEach(ann => drawAnnotation(ctx, ann));
-  }, [image, annotations, canvasSize]);
-
-  // Render in-progress annotation on overlay
-  useEffect(() => {
-    const overlay = overlayRef.current;
-    if (!overlay) return;
-    const ctx = overlay.getContext('2d');
-    if (!ctx) return;
-    ctx.clearRect(0, 0, overlay.width, overlay.height);
-    if (currentAnnotation) {
-      drawAnnotation(ctx, currentAnnotation);
-    }
-  }, [currentAnnotation]);
-
   function drawAnnotation(ctx: CanvasRenderingContext2D, ann: Annotation) {
     ctx.save();
     ctx.strokeStyle = ann.color;
@@ -176,6 +141,41 @@ export default function EditorPage() {
     ctx.restore();
   }
 
+  // Render base image + committed annotations to canvas
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (image) {
+      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+    } else {
+      ctx.fillStyle = '#f3f4f6';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#9ca3af';
+      ctx.font = '16px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('No image loaded', canvas.width / 2, canvas.height / 2);
+    }
+
+    annotations.forEach(ann => drawAnnotation(ctx, ann));
+  }, [image, annotations, canvasSize]);
+
+  // Render in-progress annotation on overlay
+  useEffect(() => {
+    const overlay = overlayRef.current;
+    if (!overlay) return;
+    const ctx = overlay.getContext('2d');
+    if (!ctx) return;
+    ctx.clearRect(0, 0, overlay.width, overlay.height);
+    if (currentAnnotation) {
+      drawAnnotation(ctx, currentAnnotation);
+    }
+  }, [currentAnnotation]);
+
   const getCanvasPoint = useCallback((e: React.MouseEvent<HTMLCanvasElement>): Point => {
     const canvas = overlayRef.current!;
     const rect = canvas.getBoundingClientRect();
@@ -217,10 +217,21 @@ export default function EditorPage() {
   const handleMouseUp = useCallback(() => {
     if (!isDrawing || !currentAnnotation) return;
     setIsDrawing(false);
+
+    let finalAnnotation = currentAnnotation;
+    if (currentAnnotation.type === 'text') {
+      const text = window.prompt('Enter text:');
+      if (!text) {
+        setCurrentAnnotation(null);
+        return;
+      }
+      finalAnnotation = { ...currentAnnotation, text };
+    }
+
     const MAX_HISTORY = 50;
     const next = [...imageHistoryRef.current, annotations];
     imageHistoryRef.current = next.length > MAX_HISTORY ? next.slice(next.length - MAX_HISTORY) : next;
-    setAnnotations(prev => [...prev, currentAnnotation]);
+    setAnnotations(prev => [...prev, finalAnnotation]);
     setRedoStack([]);
     setCurrentAnnotation(null);
   }, [isDrawing, currentAnnotation, annotations]);

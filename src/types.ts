@@ -47,9 +47,16 @@ export type AnnotationType =
   | 'ellipse'
   | 'text'
   | 'blur'
-  | 'pixelate'
   | 'highlight'
   | 'pen';
+
+export interface WindowInfo {
+  id: number;
+  title: string;
+  app_name: string;
+  width: number;
+  height: number;
+}
 
 export interface Point {
   x: number;
