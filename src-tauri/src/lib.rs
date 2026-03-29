@@ -7,7 +7,6 @@ use tauri::{
     tray::TrayIconBuilder,
     AppHandle, Emitter, Manager, Runtime,
 };
-use xcap::Monitor;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct WindowInfo {
@@ -47,8 +46,15 @@ fn image_to_data_url(img: &DynamicImage) -> String {
     format!("data:image/png;base64,{}", b64)
 }
 
-#[tauri::command]
-pub fn get_windows() -> Vec<WindowInfo> {
+pub mod commands {
+    use base64::{engine::general_purpose, Engine as _};
+    use image::{DynamicImage, ImageFormat};
+    use tauri::{AppHandle, Emitter, Manager, Runtime};
+    use xcap::Monitor;
+    use super::{WindowInfo, CaptureResult, ensure_screenshots_dir, image_to_data_url};
+
+    #[tauri::command]
+    pub fn get_windows() -> Vec<WindowInfo> {
     xcap::Window::all()
         .unwrap_or_default()
         .into_iter()
@@ -228,6 +234,8 @@ pub async fn show_settings<R: Runtime>(app: AppHandle<R>) -> Result<(), String> 
     Ok(())
 }
 
+} // pub mod commands
+
 fn build_tray_menu<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<Menu<R>> {
     let capture_window = MenuItem::with_id(app, "capture-window", "Capture Window", true, None::<&str>)?;
     let capture_screen = MenuItem::with_id(app, "capture-screen", "Capture Screen", true, None::<&str>)?;
@@ -292,12 +300,12 @@ pub fn run() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
-            get_windows,
-            capture_window,
-            capture_screen,
-            save_screenshot,
-            open_editor,
-            show_settings,
+            commands::get_windows,
+            commands::capture_window,
+            commands::capture_screen,
+            commands::save_screenshot,
+            commands::open_editor,
+            commands::show_settings,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
