@@ -52,13 +52,22 @@ pub fn get_windows() -> Vec<WindowInfo> {
     xcap::Window::all()
         .unwrap_or_default()
         .into_iter()
-        .filter(|w| !w.title().is_empty() && !w.is_minimized())
-        .map(|w| WindowInfo {
-            id: w.id(),
-            title: w.title().to_string(),
-            app_name: w.app_name().to_string(),
-            width: w.width(),
-            height: w.height(),
+        .filter_map(|w| {
+            let id = w.id().ok()?;
+            let title = w.title().ok()?;
+            let app_name = w.app_name().ok()?;
+            let width = w.width().ok()?;
+            let height = w.height().ok()?;
+            if title.is_empty() || w.is_minimized().unwrap_or(false) {
+                return None;
+            }
+            Some(WindowInfo {
+                id,
+                title,
+                app_name,
+                width,
+                height,
+            })
         })
         .collect()
 }
@@ -68,7 +77,7 @@ pub async fn capture_window(window_id: u32, format: Option<String>) -> Result<Ca
     let windows = xcap::Window::all().map_err(|e| e.to_string())?;
     let win = windows
         .into_iter()
-        .find(|w| w.id() == window_id)
+        .find(|w| w.id().ok() == Some(window_id))
         .ok_or("Window not found")?;
 
     let img = win.capture_image().map_err(|e| e.to_string())?;
