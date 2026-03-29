@@ -15,8 +15,8 @@ const APP_NAME = 'SimplShot';
 
 const TABS: { id: Tab; label: string; icon: string }[] = [
   { id: 'general', label: 'General', icon: '⚙️' },
-  { id: 'presets', label: 'Presets', icon: '📐' },
-  { id: 'templates', label: 'Templates', icon: '🎨' },
+  { id: 'presets', label: 'Sizes', icon: '📐' },
+  { id: 'templates', label: 'Template', icon: '🎨' },
   { id: 'about', label: 'About', icon: 'ℹ️' },
 ];
 
