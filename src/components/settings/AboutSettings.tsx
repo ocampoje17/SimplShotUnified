@@ -1,44 +1,79 @@
 export default function AboutSettings() {
   return (
-    <div className="flex flex-col items-center justify-center h-full space-y-3 text-center py-6">
-      <div className="text-6xl">📸</div>
-      <h1 className="text-2xl font-bold text-gray-800">SimplShot</h1>
-      <a
-        href="https://www.simplshot.com"
-        target="_blank"
-        rel="noreferrer"
-        className="text-sm text-blue-600 hover:underline"
-      >
-        www.simplshot.com
-      </a>
-      <p className="text-sm text-gray-500">Version 0.1.0</p>
-      <p className="text-sm text-gray-500">
-        Made by{' '}
-        <a href="https://atle.co" target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">
-          Atle Mo
-        </a>
-      </p>
-      <p className="text-xs text-gray-400 max-w-xs pt-1">
-        Cross-platform port built with Tauri, based on the macOS{' '}
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      height: '100%',
+      padding: '0 40px 16px',
+      textAlign: 'center',
+      gap: 0,
+    }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
+        {/* App icon placeholder (macOS-style camera icon) */}
+        <div style={{
+          width: 64, height: 64,
+          borderRadius: 14,
+          background: 'linear-gradient(135deg, #1c7cef 0%, #0047ab 100%)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: 32,
+          boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+        }}>
+          📸
+        </div>
+
+        {/* App name */}
+        <div style={{ fontSize: 17, fontWeight: 600, letterSpacing: -0.2 }}>SimplShot</div>
+
+        {/* Website */}
         <a
-          href="https://github.com/atlemo/SimplShot-App"
+          href="https://www.simplshot.com"
           target="_blank"
           rel="noreferrer"
-          className="hover:underline"
+          style={{ fontSize: 13, color: 'var(--mac-secondary)', textDecoration: 'none' }}
+          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.textDecoration = 'underline'; }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.textDecoration = 'none'; }}
         >
-          SimplShot App
+          www.simplshot.com
         </a>
-        .
-      </p>
 
-      <div className="pt-4 border-t border-gray-200 w-full max-w-xs space-y-1">
-        <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">Acknowledgments</p>
-        <p className="text-xs text-gray-400">
-          <a href="https://github.com/sindresorhus/KeyboardShortcuts" target="_blank" rel="noreferrer" className="hover:underline">
+        {/* Version */}
+        <div style={{ fontSize: 13, color: 'var(--mac-secondary)' }}>Version 0.1.1</div>
+
+        {/* Author */}
+        <div style={{ fontSize: 13, color: 'var(--mac-secondary)' }}>
+          Made by{' '}
+          <a
+            href="https://atle.co"
+            target="_blank"
+            rel="noreferrer"
+            style={{ color: 'var(--mac-secondary)', textDecoration: 'none' }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.textDecoration = 'underline'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.textDecoration = 'none'; }}
+          >
+            Atle Mo
+          </a>
+        </div>
+      </div>
+
+      {/* Acknowledgments at bottom */}
+      <div style={{ width: '100%' }}>
+        <div style={{ height: 1, background: 'var(--mac-separator)', margin: '0 0 12px' }} />
+        <div style={{ fontSize: 11, fontWeight: 500, color: 'var(--mac-secondary)', marginBottom: 4 }}>
+          Acknowledgments
+        </div>
+        <div style={{ fontSize: 11, color: 'var(--mac-tertiary)', lineHeight: 1.6 }}>
+          <a
+            href="https://github.com/sindresorhus/KeyboardShortcuts"
+            target="_blank"
+            rel="noreferrer"
+            style={{ color: 'var(--mac-secondary)', textDecoration: 'none' }}
+          >
             KeyboardShortcuts
-          </a>{' '}
-          by Sindre Sorhus
-        </p>
+          </a>
+          {' '}by Sindre Sorhus
+        </div>
       </div>
     </div>
   );

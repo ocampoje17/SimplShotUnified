@@ -15,8 +15,8 @@
       {
         "label": "main",
         "title": "SimplShot Settings",
-        "width": 750,
-        "height": 550,
+        "width": 500,
+        "height": 480,
         "resizable": false,
         "visible": false,
         "decorations": true
