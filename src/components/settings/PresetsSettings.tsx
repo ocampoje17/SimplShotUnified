@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
+import { nanoid } from 'nanoid';
 import type { AppSettings, WidthPreset } from '../../types';
 
 interface Props {
@@ -11,26 +12,26 @@ export default function PresetsSettings({ settings, onChange }: Props) {
   const [editName, setEditName] = useState('');
   const [editWidth, setEditWidth] = useState('');
 
-  const updatePresets = (presets: WidthPreset[]) => {
+  const updatePresets = useCallback((presets: WidthPreset[]) => {
     onChange({ ...settings, widthPresets: presets });
-  };
-
-  const addPreset = () => {
-    const newPreset: WidthPreset = {
-      id: Date.now().toString(),
-      name: 'New Preset',
-      width: 1200,
-      isEnabled: true,
-    };
-    updatePresets([...settings.widthPresets, newPreset]);
-    startEdit(newPreset);
-  };
+  }, [onChange, settings]);
 
   const startEdit = (preset: WidthPreset) => {
     setEditingId(preset.id);
     setEditName(preset.name);
     setEditWidth(preset.width.toString());
   };
+
+  const addPreset = useCallback(() => {
+    const newPreset: WidthPreset = {
+      id: nanoid(),
+      name: 'New Preset',
+      width: 1200,
+      isEnabled: true,
+    };
+    updatePresets([...settings.widthPresets, newPreset]);
+    startEdit(newPreset);
+  }, [updatePresets, settings.widthPresets]);
 
   const saveEdit = () => {
     if (!editingId) return;
