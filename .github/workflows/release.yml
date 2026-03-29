@@ -1,0 +1,113 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  publish-tauri:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # macOS ARM (Apple Silicon)
+          - platform: macos-latest
+            args: --target aarch64-apple-darwin
+            rust-target: aarch64-apple-darwin
+            name: macOS-arm64
+          # macOS Intel
+          - platform: macos-latest
+            args: --target x86_64-apple-darwin
+            rust-target: x86_64-apple-darwin
+            name: macOS-x86_64
+          # Linux x86_64
+          - platform: ubuntu-22.04
+            args: ''
+            rust-target: ''
+            name: Linux-x86_64
+          # Windows x86_64
+          - platform: windows-latest
+            args: ''
+            rust-target: ''
+            name: Windows-x86_64
+
+    runs-on: ${{ matrix.platform }}
+    name: Build (${{ matrix.name }})
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── Linux system dependencies ──────────────────────────────────────────
+      - name: Install Linux system dependencies
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            build-essential \
+            curl \
+            wget \
+            file \
+            libxdo-dev \
+            libssl-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            libx11-dev \
+            libxrandr-dev \
+            libxcomposite-dev \
+            libxcb-shape0-dev \
+            libxcb-xfixes0-dev \
+            libxext-dev
+
+      # ── Rust toolchain ─────────────────────────────────────────────────────
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.rust-target }}
+
+      - name: Cache Rust build artifacts
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri -> target
+
+      # ── Node.js / frontend ─────────────────────────────────────────────────
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: npm
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      # ── Build & publish to release ─────────────────────────────────────────
+      - name: Build and upload release artifacts
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: ${{ github.event_name == 'release' && github.ref_name || 'v0.0.0-dev' }}
+          releaseName: SimplShot ${{ github.event_name == 'release' && github.ref_name || 'dev build' }}
+          releaseBody: |
+            ## Installation
+
+            | Platform | File type | Description |
+            |----------|-----------|-------------|
+            | **Windows** | `.msi` | Windows installer (recommended) |
+            | **Windows** | `.exe` (NSIS) | Windows setup executable |
+            | **macOS (Apple Silicon)** | `.dmg` | macOS disk image for M-series Macs |
+            | **macOS (Intel)** | `.dmg` | macOS disk image for Intel Macs |
+            | **Linux** | `.deb` | Debian/Ubuntu package |
+            | **Linux** | `.rpm` | Fedora/RHEL package |
+            | **Linux** | `.AppImage` | Portable Linux executable |
+
+            > [!NOTE]
+            > On macOS, if you see a security warning, right-click the app and select **Open**.
+            > On Linux, make the AppImage executable with `chmod +x SimplShot_*.AppImage`.
+          releaseDraft: false
+          prerelease: false
+          args: ${{ matrix.args }}
